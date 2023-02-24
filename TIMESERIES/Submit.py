@@ -6,6 +6,9 @@
 # Coded by  : Rose ( Pratama Azmi A)
 # Date : 23/02/2023
 # Text Editor : Vscode + Vim
+# The dataset i used GDAXI ! 8438 in observed data in total 
+# And i already give the SHAPE! below
+# Sorry if the output is only in one cell, since i used .py when doing datascience 
 ################################################################################
 import pandas as pd
 import numpy as np
@@ -16,7 +19,7 @@ import tensorflow as tf
 
 from tensorflow import keras
 from keras.preprocessing.sequence import TimeseriesGenerator
-from keras.layers import Dense, LSTM, Dropout, GlobalAveragePooling2D
+from keras.layers import Dense, LSTM, Dropout, Bidirectional
 from keras.models import Sequential
 from typing import List,Tuple
 plt.rcParams["figure.figsize"] = (18,8)
@@ -121,8 +124,8 @@ def defineModel(name : str) -> tf.keras.Sequential :
 
     model : tf.keras.Sequential = tf.keras.Sequential(name=name)
     model.add(LSTM(128, return_sequences= True, input_shape=(n_length, 1))) # (30, 1) Sesuai Batches 
-    model.add(LSTM(64, return_sequences=False))
-    model.add(Dense(64, activation=tf.nn.relu))
+    model.add(Bidirectional(LSTM(64, return_sequences=False)))
+    model.add(Dense(128, activation=tf.nn.tanh))
     model.add(Dropout(0.3))
     model.add(Dense(32, activation=tf.nn.relu))
     model.add(Dense(1))
@@ -182,8 +185,18 @@ labelsInfo : List[str] = ["30 days", "60 days", "90 days"]
 plotRolling(gdaxi_df,"Close", rollingInfo, labelsInfo, "GDXAII CLOSE ")
 #%%
 
+########################################################################################
+#####
+##### VALIDATION SET is 22 % ! 
+##### TOTAL GDAXI = 8438
+##### TRAIN GDAXI = 6567
+##### PROOF = 8438 * 20 = 1687 OBSERVER DATA! ( 1687 * 100 / 8438) = 20 percent !
+##### VALIDATION GDAXI = 1871 (1871 * 100 / 8438) = 22 Percent !
+########################################################################################
 gdaxi_train, gdaxi_test = prepareTestingData(gdaxi_df, "Close", "2014-01-01")
-
+print(gdaxi_df.shape,
+      gdaxi_train.shape,
+      gdaxi_test.shape)
 plt.plot(gdaxi_test, label="After 2019", color="black")
 plt.plot(gdaxi_train, label="Before 2019", color="red")
 plt.legend()
