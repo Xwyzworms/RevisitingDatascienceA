@@ -62,7 +62,11 @@ class SimpleLinearRegression():
             raise Exception("Please fit the data first !, call SimpleLinearRegression.fit(x,y)")
         return self.b0 + self.b1*x
 
+
+
+
 #%%
+##############################################################################################################################################
 ## Plotting dummy data 
 
 
@@ -125,5 +129,75 @@ print(np.sqrt(mean_squared_error(y_test, sk_preds)))
 
 ### The result should be the same !
 ### I love mathematics ! Let Continue again
+##################################################################################################################################################################
 # %%
+#### Simple Analysis for Housing dataset
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 
+plt.rcParams["figure.figsize"] = (14,8)
+from sklearn.model_selection import train_test_split 
+df : pd.DataFrame = pd.read_csv("housing.csv")
+df.head()
+
+print(df.isna().sum())
+
+def printGeneralInformation(df : pd.DataFrame) :
+    print(df.describe())
+    print(df.var())
+
+def drawScatterPlot(df, x : str ,y : str, title : str) -> None:
+    sns.scatterplot(data=df,y=df[x],x=df[y])
+    plt.title(title)
+    plt.show()
+
+def drawBarplot(df, x : str, y : str, title: str):
+    sns.barplot(data=df,y=df[x],x=df[y])
+    plt.title(title)
+    plt.show()
+printGeneralInformation(df)
+
+
+#%%
+sns.heatmap(df.corr(), cmap="BuGn", annot=True, fmt=".2f")
+
+#%% 
+## Draw Scatter plot for Area 
+drawScatterPlot(df,"price","area","Area's Effect to Prices")
+
+#%%
+x :np.array = df["area"].values
+y : np.array = df["price"].values
+
+x_train,x_test,y_train,y_test = train_test_split(x,y, test_size=0.2)
+simpleLin : SimpleLinearRegression() = SimpleLinearRegression()
+simpleLin.fit(x_train,y_train)
+preds = simpleLin.predict(x_test)
+print(np.sqrt(mean_squared_error(y_test,preds)))
+
+#%%
+
+y_train_preds = simpleLin.predict(x_train)
+plt.scatter(x_train,y_train, label="Train set ")
+plt.plot(x_train, y_train_preds, color="#333333", label=f"Intercept : {simpleLin.b0:.2f} Area Gradient : {simpleLin.b1:.2f}" )
+plt.legend()
+plt.xlabel("Area")
+plt.title("Train set result")
+
+
+#%%
+plt.scatter(x_test,y_test, label="Test set ")
+plt.plot(x_test, preds, color="#333333", label=f"Intercept : {simpleLin.b0:.2f} Area Gradient : {simpleLin.b1:.2f}" )
+plt.legend()
+plt.xlabel("Area")
+plt.title("Test set result")
+
+# %%
+print(simpleLin.b0)
+print(simpleLin.b1)
+#%%
+df["area"]
+#%%
+df[df["area"] <= 2000]["price"].mean()
