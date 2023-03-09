@@ -201,3 +201,36 @@ print(simpleLin.b1)
 df["area"]
 #%%
 df[df["area"] <= 2000]["price"].mean()
+
+#%%
+from sklearn.linear_model import LinearRegression
+#%%% 
+# For Analysis of the Bathrooms, Bedrooms, and parking
+def funcJustDoSimple(x : np.array, y :np.array, title : str):
+    x_train,x_test,y_train,y_test = train_test_split(x,y, test_size=0.2, random_state=32)
+
+    simpleLinReg: SimpleLinearRegression = SimpleLinearRegression()
+    simpleLinReg.fit(x_train, y_train)
+
+    LinRegSklearn = LinearRegression()
+    LinRegSklearn.fit(x_train.reshape(-1,1),y_train)
+    y_linReg = LinRegSklearn.predict(x_test.reshape(-1,1))
+    y_preds  : np.array =  simpleLinReg.predict(x_test)
+    print(f"###########################  {title}  ############################################")
+    print(f"Intercept : {simpleLinReg.b0:.2f}  Gradient {simpleLinReg.b1:.2f}")
+    print(np.sqrt(mean_squared_error(y_test,y_preds)))
+    
+    print(f"Intercept : {LinRegSklearn.intercept_:.2f}  Gradient {LinRegSklearn.coef_[0]:.2f}")
+    print(np.sqrt(mean_squared_error(y_test,y_preds)))
+    print(f"###########################  {title}  ############################################")
+    print()
+    
+    
+
+x_bathrooms : np.array = df["bathrooms"].values
+x_bedrooms : np.array = df["bedrooms"].values
+
+
+funcJustDoSimple(x_bathrooms, df["price"], "BathRooms")
+funcJustDoSimple(x_bedrooms, df["price"], "Bedrooms")
+#%%w
